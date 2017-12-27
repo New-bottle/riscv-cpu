@@ -33,8 +33,8 @@
 //********************** ROM related define ***************************
 `define InstAddrBus       31:0            // ROM 的地址总线宽度
 `define InstBus           31:0            // ROM 的数据总线宽度
-`define InstMemNum        131071          // ROM 的实际大小为128KB
-`define InstMemNumLog2    17              // ROM 实际使用的地址线宽度
+`define InstMemNum        4               // ROM 的实际大小为<del>32KB<\del>
+`define InstMemNumLog2    2               // ROM 实际使用的地址线宽度
 
 
 //****************** global REG regfile related define ****************

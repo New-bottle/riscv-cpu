@@ -24,7 +24,7 @@ reg[`RegBus]  regs[0:`RegNum-1];
 
 // write operation
 always @ (posedge clk) begin
-	if (rst == 'RstDisable) begin
+	if (rst == `RstDisable) begin
 		if ((we == `WriteEnable) && (waddr != `RegNumLog2'h0)) begin
 			regs[waddr] <= wdata;
 		end
@@ -34,7 +34,7 @@ end
 // read operation on read port 1
 always @ (*) begin
 	if (rst == `RstEnable) begin
-		rdata1 <= 'ZeroWord;
+		rdata1 <= `ZeroWord;
 	end else if (raddr1 == `RegNumLog2'h0) begin
 		rdata1 <= `ZeroWord;
 	end else if ((raddr1 == waddr) && (we == `WriteEnable) && (re1 == `ReadEnable)) begin
@@ -49,7 +49,7 @@ end
 // read operation on read port 2
 always @ (*) begin
 	if (rst == `RstEnable) begin
-		rdata2 <= 'ZeroWord;
+		rdata2 <= `ZeroWord;
 	end else if (raddr2 == `RegNumLog2'h0) begin
 		rdata2 <= `ZeroWord;
 	end else if ((raddr2 == waddr) && (we == `WriteEnable) && (re2 == `ReadEnable)) begin
@@ -61,3 +61,4 @@ always @ (*) begin
 	end
 end
 
+endmodule
