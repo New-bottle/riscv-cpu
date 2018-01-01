@@ -40,6 +40,9 @@ module ex (
 			`EXE_RES_LOGIC: begin
 				wdata_o <= logicout;
 			end
+			`OP_OP_IMM: begin
+				s
+			end
 			default: begin
 				wdata_o <= `ZeroWord;
 			end
