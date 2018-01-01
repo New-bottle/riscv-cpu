@@ -12,7 +12,12 @@ module ex (
 	// result of ex
 	output reg[`RegAddrBus] wd_o,
 	output reg              wreg_o,
-	output reg[`RegBus]     wdata_o
+	output reg[`RegBus]     wdata_o,
+
+	// forwarding to id
+	output reg              ex_wreg_o,
+	output reg[`RegBus]     ex_wdata_o,
+	output reg[`RegAddrBus] ex_wd_o
 );
 
 	reg[`RegBus]            logicout;
@@ -102,18 +107,24 @@ module ex (
 	always @ (*) begin
 		wd_o <= wd_i;
 		wreg_o <= wreg_i;
+		ex_wreg_o <= wreg_i;
+		ex_wd_o <= wd_i;
 		case (alusel_i)
 			`EXE_RES_LOGIC:begin
 				wdata_o <= logicout;
+				ex_wdata_o <= logicout;
 			end
 			`EXE_RES_ARITH:begin
 				wdata_o <= arithout;
+				ex_wdata_o <= arithout;
 			end
 			`EXE_RES_SHIFT:begin
 				wdata_o <= shiftres;
+				ex_wdata_o <= shiftres;
 			end
 			default: begin
 				wdata_o <= `ZeroWord;
+				ex_wdata_o <= `ZeroWord;
 			end
 		endcase
 	end
