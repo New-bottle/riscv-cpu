@@ -60,13 +60,12 @@ always @ (*) begin
 		reg2_addr_o <= `NOPRegAddr;
 		imm         <= 32'h0;
 	end else begin
+		/*
 		aluop_o <= `EXE_NOP_OP;
 		alusel_o <= `EXE_RES_NOP;
 		wd_o <= inst_i[11:7];
-		/*
 		TODO
 		wd_o 的初值？？
-		*/
 		wreg_o <= `WriteDisable;
 		instvalid <= `InstValid;
 		reg1_read_o <= 1'b0;
@@ -74,6 +73,7 @@ always @ (*) begin
 		reg1_addr_o <= inst_i[25:21];
 		reg2_addr_o <= inst_i[20:16];
 		imm         <= `ZeroWord;
+		*/
 
 		case (op)
 			`OP_OP_IMM:begin
@@ -140,6 +140,97 @@ always @ (*) begin
 					end
 				endcase
 			end
+
+			`OP_OP:begin
+				reg1_read_o <= 1'b1;
+				reg2_read_o <= 1'b1;
+				reg1_addr_o <= inst_i[19:15];
+				reg2_addr_o <= inst_i[24:20];
+				wreg_o <= `WriteEnable;
+				wd_o <= inst_i[11:7];
+				instvalid <= `InstValid;
+				imm <= {20'h0, inst_i[31:20]};
+				case (funct3)
+					`FUNCT3_ADD:begin
+						case (funct7)
+							`FUNCT7_ADD:begin
+								aluop_o <= `EXE_ADD_OP;
+								alusel_o <= `EXE_RES_ARITH;
+							end
+							`FUNCT7_SUB:begin
+								aluop_o <= `EXE_SUB_OP;
+								alusel_o <= `EXE_RES_ARITH;
+							end
+							default:begin
+							end
+						endcase
+					end
+					`FUNCT3_SLT:begin
+						aluop_o <= `EXE_SLT_OP;
+						alusel_o <= `EXE_RES_ARITH;
+					end
+					`FUNCT3_SLTU:begin
+						aluop_o <= `EXE_SLTIU_OP;
+						alusel_o <= `EXE_RES_ARITH;
+					end
+					`FUNCT3_XOR:begin
+						aluop_o <= `EXE_XOR_OP;
+						alusel_o <= `EXE_RES_LOGIC;
+					end
+					`FUNCT3_OR:begin
+						aluop_o <= `EXE_OR_OP;
+						alusel_o <= `EXE_RES_LOGIC;
+					end
+					`FUNCT3_AND:begin
+						aluop_o <= `EXE_AND_OP;
+						alusel_o <= `EXE_RES_LOGIC;
+					end
+					`FUNCT3_SLL:begin
+						aluop_o <= `EXE_SLL_OP;
+						alusel_o <= `EXE_RES_SHIFT;
+					end
+					`FUNCT3_SRL_SRA:begin
+						case (funct7)
+							`FUNCT7_SRL:begin
+								aluop_o <= `EXE_SRL_OP;
+								alusel_o <= `EXE_RES_SHIFT;
+							end
+							`FUNCT7_SRA:begin
+								aluop_o <= `EXE_SRA_OP;
+								alusel_o <= `EXE_RES_SHIFT;
+							end
+						endcase
+					end
+					default:begin
+					end
+				endcase
+			end
+			`OP_LUI:begin
+				aluop_o <= `EXE_LUI_OP;
+				alusel_o <= `EXE_RES_NOP;
+				reg1_read_o <= 1'b0;
+				reg2_read_o <= 1'b0;
+				reg1_addr_o <= `NOPRegAddr;
+				reg2_addr_o <= `NOPRegAddr;
+				wreg_o <= `WriteEnable;
+				wd_o <= inst_i[11:7];
+				instvalid <= `InstValid;
+				imm <= {inst_i[31:12], 12'b0};
+			end
+			`OP_AUIPC:begin
+				aluop_o <= `EXE_AUIPC_OP;
+				alusel_o <= `EXE_RES_NOP;
+				reg1_read_o <= 1'b0;
+				reg2_read_o <= 1'b0;
+				reg1_addr_o <= `NOPRegAddr;
+				reg2_addr_o <= `NOPRegAddr;
+				wreg_o <= `WriteEnable;
+				wd_o <= inst_i[11:7];
+				instvalid <= `InstValid;
+				imm <= {inst_i[31:12], 12'b0};
+			end
+
+
 			default:begin
 			end
 		endcase
