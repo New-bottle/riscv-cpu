@@ -114,7 +114,7 @@
 `define FUNCT3_ORI       3'b110
 `define FUNCT3_ANDI      3'b111
 // OP
-`define FUNCT3_ADD_SUB 3'b000
+`define FUNCT3_ADD     3'b000
 `define FUNCT3_SLL     3'b001
 `define FUNCT3_SLT     3'b010
 `define FUNCT3_SLTU    3'b011
