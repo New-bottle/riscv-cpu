@@ -35,11 +35,9 @@ module id (
 );
 
 // 取得指令的指令码，功能码
-// 对于ori指令只需通过判断第26-31bit的值，即可判断是否是ori指令
-wire[5:0] op = inst_i[31:26];
-wire[4:0] op2 = inst_i[10:6];
-wire[5:0] op3 = inst_i[5:0];
-wire[4:0] op4 = inst_i[20:16];
+wire [6:0] op = inst_i[6:0];
+wire [2:0] funct3 = inst_i[14:12];
+wire [6:0] funct7 = inst_i[31:25];
 
 // 保存指令执行需要的立即数
 reg[`RegBus]   imm;
@@ -64,7 +62,11 @@ always @ (*) begin
 	end else begin
 		aluop_o <= `EXE_NOP_OP;
 		alusel_o <= `EXE_RES_NOP;
-		wd_o <= inst_i[15:11];
+		wd_o <= inst_i[11:7];
+		/*
+		TODO
+		wd_o 的初值？？
+		*/
 		wreg_o <= `WriteDisable;
 		instvalid <= `InstValid;
 		reg1_read_o <= 1'b0;
@@ -74,6 +76,67 @@ always @ (*) begin
 		imm         <= `ZeroWord;
 
 		case (op)
+			`OP_OP_IMM:begin
+				reg1_read_o <= 1'b1;
+				reg2_read_o <= 1'b0;
+				reg1_addr_o <= inst_i[19:15];
+				reg2_addr_o <= 'NOPRegAddr;
+				wreg_o <= `WriteEnable;
+				wd_o <= inst_i[11:7];
+				instvalid <= `InstValid;
+				imm <= {{20'h0, inst_i[31:20]};
+				case (funct3)
+					`FUNCT3_ADDI:begin
+						case (funct7)
+							`FUNCT7_ADD:begin
+								aluop_o <= `EXE_ADDI_OP;
+								alusel_o <= `EXE_RES_ARITH;
+							end
+							`FUNCT7_SUB:begin
+								aluop_o <= `EXE_SUBI_OP;
+								alusel_o <= `EXE_RES_ARITH;
+							end
+					end
+					`FUNCT3_SLTI:begin
+						aluop_o <= `EXE_SLTI_OP;
+						alusel_o <= `EXE_RES_ARITH;
+					end
+					`FUNCT3_SLITU:begin
+						aluop_o <= `EXE_SLTIU_OP;
+						alusel_o <= `EXE_RES_ARITH;
+					end
+					`FUNCT3_XORI:begin
+						aluop_o <= `EXE_XORI_OP;
+						alusel_o <= `EXE_RES_LOGIC;
+					end
+					`FUNCT3_ORI:begin
+						aluop_o <= `EXE_ORI_OP;
+						alusel_o <= `EXE_RES_LOGIC;
+					end
+					`FUNCT3_ANDI:begin
+						aluop_o <= `EXE_ANDI_OP;
+						alusel_o <= `EXE_RES_LOGIC;
+					end
+					`FUNCT3_SLLI:begin
+						aluop_o <= `EXE_SLLI_OP;
+						alusel_o <= `EXE_RES_SHIFT;
+					end
+					`FUNCT3_SRLI_SRAI:begin
+						case (funct7)
+							`FUNCT7_SRL:begin
+								aluop_o <= `EXE_SRLI_OP;
+								alusel_o <= `EXE_RES_SHIFT;
+							end
+							`FUNCT7_SRA:begin
+								aluop_o <= `EXE_SRAI_OP;
+								alusel_o <= `EXE_RES_SHIFT;
+							end
+						endcase
+					end
+					default:begin
+					end
+				endcase
+			end
 			`EXE_ORI: begin
 				wreg_o <= `WriteEnable;
 				aluop_o <= `EXE_OR_OP;
