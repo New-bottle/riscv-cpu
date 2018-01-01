@@ -45,23 +45,29 @@ module ex (
 	// arithmetic
 	reg [`RegBus] reg2_i_mux;
 	reg [`RegBus] result_sum;
-	assign reg2_i_mux = ((sel2_i == `FUNCT7_SUB) || 
-						 (aluop_i == `FUNCT3_SLT)) ? 
+	assign reg2_i_mux = ((aluop_i == `EXE_SUB_OP) || 
+						 (aluop_i == `EXE_SUBI_OP)) ||
+						 (aluop_i == `EXE_SLT_OP)) ? 
 						 (~reg2_i) + 1 : reg2_i;
 	assign result_sum = reg1_i + reg2_i_mux;
-	assign 
+	assign reg1_lt_reg2 = ((aluop_i == `EXE_SLT_OP)) ? 
+						((reg1_i[31] && !reg2_i[31]) ||
+						(!reg1_i[31] && !reg2_i[31] && result_sum[31]) ||
+						(reg1_i[31] && reg2_i[31] && result_sum[31]))
+						:(reg1_i < reg2_i);
 	always @ (*) begin
 		if (rst == `RstEnable) begin
 			arithout <= `ZeroWord;
 		end else begin
 			case (aluop_i)
-				`FUNCT3_ADDI:begin
-					arithout <= reg1_i + reg2_i;
+				`EXE_ADDI_OP, `EXE_ADD_OP:begin
+					arithout <= result_sum;
 				end
-				`FUNCT3_SLLI:begin
-					arithout <= reg1_i << reg2_i;
+				`EXE_SUBI_OP, `EXE_SUB_OP:begin
+					arithout <= result_sum;
 				end
-				`FUNCT3_SLTI:begin
+				`EXE_SLTI_OP, `EXE_SLT_OP:begin
+					arithout <= reg1_lt_reg2;
 				end
 	end
 
@@ -78,8 +84,8 @@ module ex (
 					shiftres <= reg1_o >> reg2_i[4:0];
 				end
 				`EXE_SRAI_OP, `EXE_SRA_OP:begin
-					shiftres <= ({32{reg2_i[31]}}<<(6'd32-{1'b0,reg1_i[5:0]}))
-								| reg2_i >> reg1_i[4:0];
+					shiftres <= ({32{reg1_i[31]}}<<(6'd32-{1'b0,reg2_i[5:0]}))
+								| reg1_i >> reg2_i[4:0];
 				end
 				default:begin
 					shiftres <= `ZeroWord;
@@ -92,11 +98,14 @@ module ex (
 		wd_o <= wd_i;
 		wreg_o <= wreg_i;
 		case (alusel_i)
-			`EXE_:begin
-				wdata_o <= 
-			end
-			`OP_OP: begin
+			`EXE_RES_LOGIC:begin
 				wdata_o <= logicout;
+			end
+			`EXE_RES_ARITH:begin
+				wdata_o <= arithout;
+			end
+			`EXE_RES_SHIFT:begin
+				wdata_o <= shiftres;
 			end
 			default: begin
 				wdata_o <= `ZeroWord;
