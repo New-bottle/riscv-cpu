@@ -80,11 +80,11 @@ always @ (*) begin
 				reg1_read_o <= 1'b1;
 				reg2_read_o <= 1'b0;
 				reg1_addr_o <= inst_i[19:15];
-				reg2_addr_o <= 'NOPRegAddr;
+				reg2_addr_o <= `NOPRegAddr;
 				wreg_o <= `WriteEnable;
 				wd_o <= inst_i[11:7];
 				instvalid <= `InstValid;
-				imm <= {{20'h0, inst_i[31:20]};
+				imm <= {20'h0, inst_i[31:20]};
 				case (funct3)
 					`FUNCT3_ADDI:begin
 						case (funct7)
@@ -96,12 +96,15 @@ always @ (*) begin
 								aluop_o <= `EXE_SUBI_OP;
 								alusel_o <= `EXE_RES_ARITH;
 							end
+							default:begin
+							end
+						endcase
 					end
 					`FUNCT3_SLTI:begin
 						aluop_o <= `EXE_SLTI_OP;
 						alusel_o <= `EXE_RES_ARITH;
 					end
-					`FUNCT3_SLITU:begin
+					`FUNCT3_SLTIU:begin
 						aluop_o <= `EXE_SLTIU_OP;
 						alusel_o <= `EXE_RES_ARITH;
 					end
@@ -136,16 +139,6 @@ always @ (*) begin
 					default:begin
 					end
 				endcase
-			end
-			`EXE_ORI: begin
-				wreg_o <= `WriteEnable;
-				aluop_o <= `EXE_OR_OP;
-				alusel_o <= `EXE_RES_LOGIC;
-				reg1_read_o <= 1'b1;
-				reg2_read_o <= 1'b0;
-				imm <= {16'h0, inst_i[15:0]};
-				wd_o <= inst_i[20:16];
-				instvalid <= `InstValid;
 			end
 			default:begin
 			end
