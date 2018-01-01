@@ -41,6 +41,10 @@
 `define EXE_OR_OP         9'b011001100
 `define EXE_AND_OP        9'b011001110
 
+// c.LUI & AUIPC
+`define EXE_LUI_OP        9'b011010000
+`define EXE_AUIPC_OP      9'b001010000
+
 //`define EXE_OR_OP         8'b00100101
 `define EXE_NOP_OP        9'b000000000
 
@@ -54,8 +58,8 @@
 //********************** ROM related define ***************************
 `define InstAddrBus       31:0            // ROM 的地址总线宽度
 `define InstBus           31:0            // ROM 的数据总线宽度
-`define InstMemNum        4               // ROM 的实际大小为<del>32KB<\del>
-`define InstMemNumLog2    2               // ROM 实际使用的地址线宽度
+`define InstMemNum        16              // ROM 的实际大小为<del>32KB<\del>
+`define InstMemNumLog2    4               // ROM 实际使用的地址线宽度
 
 
 //****************** global REG regfile related define ****************
