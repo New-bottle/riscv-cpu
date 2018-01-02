@@ -56,7 +56,7 @@ module ex (
 						 (aluop_i == `EXE_SLT_OP)) ? 
 						 (~reg2_i)+1 : reg2_i;
 	assign result_sum = reg1_i + reg2_i_mux;
-	assign reg1_lt_reg2 = ((aluop_i == `EXE_SLT_OP)) ? 
+	assign reg1_lt_reg2 = ((aluop_i == `EXE_SLT_OP) || aluop_i == `EXE_SLTI_OP) ? 
 						((reg1_i[31] && !reg2_i[31]) ||
 						(!reg1_i[31] && !reg2_i[31] && result_sum[31]) ||
 						(reg1_i[31] && reg2_i[31] && result_sum[31]))
