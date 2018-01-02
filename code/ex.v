@@ -72,7 +72,7 @@ module ex (
 				`EXE_SUBI_OP, `EXE_SUB_OP:begin
 					arithout <= result_sum;
 				end
-				`EXE_SLTI_OP, `EXE_SLT_OP:begin
+				`EXE_SLTI_OP, `EXE_SLT_OP, `EXE_SLTIU_OP:begin
 					arithout <= reg1_lt_reg2;
 				end
 				default:begin
@@ -121,6 +121,10 @@ module ex (
 			`EXE_RES_SHIFT:begin
 				wdata_o <= shiftres;
 				ex_wdata_o <= shiftres;
+			end
+			`EXE_RES_NOP:begin
+				wdata_o <= reg1_i;
+				ex_wdata_o <= reg1_i;
 			end
 			default: begin
 				wdata_o <= `ZeroWord;
