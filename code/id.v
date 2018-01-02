@@ -84,7 +84,7 @@ always @ (*) begin
 				wreg_o <= `WriteEnable;
 				wd_o <= inst_i[11:7];
 				instvalid <= `InstValid;
-				imm <= {20'h0, inst_i[31:20]};
+				imm <= {21{inst_i[31]}, inst_i[30:20]};
 				case (funct3)
 					`FUNCT3_ADDI:begin
 						case (funct7)
@@ -149,7 +149,7 @@ always @ (*) begin
 				wreg_o <= `WriteEnable;
 				wd_o <= inst_i[11:7];
 				instvalid <= `InstValid;
-				imm <= {20'h0, inst_i[31:20]};
+				imm <= `ZeroWord;
 				case (funct3)
 					`FUNCT3_ADD:begin
 						case (funct7)
@@ -262,10 +262,10 @@ always @ (*) begin
 	if (rst == `RstEnable) begin
 		reg2_o <= `ZeroWord;
 	end else if ((reg2_read_o == 1'b1) && (ex_wreg_i == 1'b1)
-				  && (ex_wd_i == reg1_addr_o)) begin
+				  && (ex_wd_i == reg2_addr_o)) begin
 		reg2_o <= ex_wdata_i;
 	end else if ((reg2_read_o == 1'b1) && (mem_wreg_i == 1'b1)
-				  && (mem_wd_i == reg1_addr_o)) begin
+				  && (mem_wd_i == reg2_addr_o)) begin
 		reg2_o <= mem_wdata_i;
 	end else if (reg2_read_o == 1'b1) begin
 		reg2_o <= reg2_data_i;
