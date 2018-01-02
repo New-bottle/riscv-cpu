@@ -84,7 +84,7 @@ always @ (*) begin
 				wreg_o <= `WriteEnable;
 				wd_o <= inst_i[11:7];
 				instvalid <= `InstValid;
-				imm <= {21{inst_i[31]}, inst_i[30:20]};
+				imm <= {{21{inst_i[31]}}, inst_i[30:20]};
 				case (funct3)
 					`FUNCT3_ADDI:begin
 						case (funct7)
