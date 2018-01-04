@@ -7,16 +7,16 @@ Instructions : (0/39)
 
 - [x] Integer Register-Immediate Instructions
 
-      - [x] ADDI
-      - [x] ANDI
-      - [x] ORI
-      - [x] XORI
-      - [x] SLTI (set less than integer)
-      - [x] SLLI (logical left shift)
-      - [x] SRLI (logical right shift)
-      - [x] SRAI (arithmetic right shift)
-      - [x] LUI (load upper immediate)
-      - [x] AUIPC (add upper immediate to pc)
+     - [x] ADDI
+     - [x] ANDI
+     - [x] ORI
+     - [x] XORI
+     - [x] SLTI (set less than integer)
+     - [x] SLLI (logical left shift)
+     - [x] SRLI (logical right shift)
+     - [x] SRAI (arithmetic right shift)
+     - [x] LUI (load upper immediate)
+     - [x] AUIPC (add upper immediate to pc)
 
 - [x] Integer Register-Register Operations
 
