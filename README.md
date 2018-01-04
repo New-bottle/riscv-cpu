@@ -5,67 +5,66 @@ Computer Architecture homework
 ---
 Instructions : (0/39)
 
-- [ ] Integer Register-Immediate Instructions
+- [x] Integer Register-Immediate Instructions
 
-      -[ ] ADDI
-      -[ ] ANDI
-      -[ ] ORI
-      -[ ] XORI
-      -[ ] SLTI (set less than integer)
-      -[ ] SLLI (logical left shift)
-      -[ ] SRLI (logical right shift)
-      -[ ] SRAI (arithmetic right shift)
-      -[ ] LUI (load upper immediate)
-      -[ ] AUIPC (add upper immediate to pc)
+      - [x] ADDI
+      - [x] ANDI
+      - [x] ORI
+      - [x] XORI
+      - [x] SLTI (set less than integer)
+      - [x] SLLI (logical left shift)
+      - [x] SRLI (logical right shift)
+      - [x] SRAI (arithmetic right shift)
+      - [x] LUI (load upper immediate)
+      - [x] AUIPC (add upper immediate to pc)
 
--[ ] Integer Register-Register Operations
+- [x] Integer Register-Register Operations
 
-     -[ ] ADD
-     -[ ] SUB
-     -[ ] AND
-     -[ ] OR
-     -[ ] XOR
+     - [x] ADD
+     - [x] SUB
+     - [x] AND
+     - [x] OR
+     - [x] XOR
 
-     - [ ] SLL
-     - [ ] SRL
-     - [ ] SRA
+     - [x] SLL
+     - [x] SRL
+     - [x] SRA
 
-     -[ ] SLT
-     -[ ] SLTU
+     - [x] SLT
+     - [x] SLTU
 
--[ ] Control Transfer Instructions
+- [ ] Control Transfer Instructions
 
-     -[ ] Unconditional Jumps
-          -[ ] JAL
-          -[ ] JALR
-     -[ ] Conditional Branches
-          -[ ] BEQ
-          -[ ] BNE
-          -[ ] BLT(U)
-          -[ ] BGE(U)
+     - [ ] Unconditional Jumps
+          - [ ] JAL
+          - [ ] JALR
+     - [ ] Conditional Branches
+          - [ ] BEQ
+          - [ ] BNE
+          - [ ] BLT(U)
+          - [ ] BGE(U)
 
--[ ] Load and Store
+- [ ] Load and Store
 
-     -[ ] LOAD
-     -[ ] STORE
+     - [ ] LOAD
+     - [ ] STORE
 
--[ ] Control and Status Register Instructions (System)
+- [ ] Control and Status Register Instructions (System)
 
-     -[ ] CSR Instructoins
-          -[ ] CSRRW
-          -[ ] CSRRS
-          -[ ] CSRRC
-          -[ ] CSRRWI
-          -[ ] CSRRSI
-          -[ ] CSRRCI
-     -[ ] Timers and Counters
-          -[ ] RDCYCLE
-          -[ ] RDTIME
-          -[ ] RDINSTRET
-     -[ ] Environment Call and Breakpoints
-          -[ ] ECALL
-          -[ ] EBREAK
-
+     - [ ] CSR Instructoins
+          - [ ] CSRRW
+          - [ ] CSRRS
+          - [ ] CSRRC
+          - [ ] CSRRWI
+          - [ ] CSRRSI
+          - [ ] CSRRCI
+     - [ ] Timers and Counters
+          - [ ] RDCYCLE
+          - [ ] RDTIME
+          - [ ] RDINSTRET
+     - [ ] Environment Call and Breakpoints
+          - [ ] ECALL
+          - [ ] EBREAK
 
 
 ---
@@ -75,6 +74,12 @@ Instructions : (0/39)
 http://www.asic-world.com/systemverilog/tutorial.html
 
 ---
+
+## 2. Forwarding
+
+​	将EX和MEM阶段的结果直接送回decode阶段，从时序上来讲，EX的指令在MEM指令之后，所以最后会是EX的结果覆盖掉MEM的结果。所以优先将EX的结果forwarding回去，然后是MEM。
+
+
 
 ## Log :
 
