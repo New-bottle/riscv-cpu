@@ -64,18 +64,6 @@ always @ (*) begin
 		imm         <= 32'h0;
 	end else begin
 		/*
-		aluop_o <= `EXE_NOP_OP;
-		alusel_o <= `EXE_RES_NOP;
-		wd_o <= inst_i[11:7];
-		TODO
-		wd_o 的初值？？
-		wreg_o <= `WriteDisable;
-		instvalid <= `InstValid;
-		reg1_read_o <= 1'b0;
-		reg2_read_o <= 1'b0;
-		reg1_addr_o <= inst_i[25:21];
-		reg2_addr_o <= inst_i[20:16];
-		imm         <= `ZeroWord;
 		*/
 
 		case (op)
@@ -235,6 +223,16 @@ always @ (*) begin
 
 
 			default:begin
+				aluop_o <= `EXE_NOP_OP;
+				alusel_o <= `EXE_RES_NOP;
+				wd_o <= 5'b00000;
+				wreg_o <= `WriteDisable;
+				instvalid <= `InstValid;
+				reg1_read_o <= 1'b0;
+				reg2_read_o <= 1'b0;
+				reg1_addr_o <= `NOPRegAddr;
+				reg2_addr_o <= `NOPRegAddr;
+				imm         <= `ZeroWord;
 			end
 		endcase
 	end
