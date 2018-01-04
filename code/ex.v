@@ -17,7 +17,9 @@ module ex (
 	// forwarding to id
 	output reg              ex_wreg_o,
 	output reg[`RegBus]     ex_wdata_o,
-	output reg[`RegAddrBus] ex_wd_o
+	output reg[`RegAddrBus] ex_wd_o,
+	
+	output reg[5:0]         stallreq
 );
 
 	reg[`RegBus]            logicout;

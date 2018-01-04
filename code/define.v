@@ -14,6 +14,8 @@
 `define False_v           1'b0            // logical false
 `define ChipEnable        1'b1            // 芯片使能
 `define ChipDisable       1'b0            // 芯片禁止
+`define Stop              1'b1            // 流水线暂停
+`define NoStop            1'b0            // 流水线继续
 
 //***********************  Inst related define  ***********************
 // 1. AluOp

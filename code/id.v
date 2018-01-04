@@ -31,7 +31,9 @@ module id (
 	output reg[`RegBus]       reg1_o,
 	output reg[`RegBus]       reg2_o,
 	output reg[`RegAddrBus]   wd_o,
-	output reg                wreg_o
+	output reg                wreg_o,
+
+	output wire               stallreq
 );
 
 // 取得指令的指令码，功能码
@@ -45,6 +47,7 @@ reg[`RegBus]   imm;
 // 指示指令是否有效
 reg instvalid;
 
+assign stallreq = `NoStop;
 
 // Part1: Instruction Decode
 always @ (*) begin
