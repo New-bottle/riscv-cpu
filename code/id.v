@@ -63,9 +63,6 @@ always @ (*) begin
 		reg2_addr_o <= `NOPRegAddr;
 		imm         <= 32'h0;
 	end else begin
-		/*
-		*/
-
 		case (op)
 			`OP_OP_IMM:begin
 				reg1_read_o <= 1'b1;
@@ -225,7 +222,7 @@ always @ (*) begin
 			default:begin
 				aluop_o <= `EXE_NOP_OP;
 				alusel_o <= `EXE_RES_NOP;
-				wd_o <= 5'b00000;
+				wd_o <= `NOP_RegAddr;
 				wreg_o <= `WriteDisable;
 				instvalid <= `InstValid;
 				reg1_read_o <= 1'b0;
