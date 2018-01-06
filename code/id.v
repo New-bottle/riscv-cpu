@@ -275,7 +275,8 @@ always @ (*) begin
 				reg2_read_o <= 1'b1;
 				reg1_addr_o <= inst_i[19:15];
 				reg2_addr_o <= inst_i[24:20];
-				link_addr_o <= {{19{inst_i[31]}}, inst_i[7], inst_i[30:25], inst_i[11:8], 1'b0};
+				imm <= {{19{inst_i[31]}}, inst_i[7], inst_i[30:25], inst_i[11:8], 1'b0};
+				link_addr_o <= `ZeroWord;
 				branch_flag_o <= 1'b0;
 				case (funct3)
 					`FUNCT3_BEQ:begin
