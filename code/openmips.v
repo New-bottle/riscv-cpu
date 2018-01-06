@@ -70,10 +70,15 @@ module openmips(
 	wire stallreq_from_id;
 	wire stallreq_from_ex;
 
+	wire branch_flag;
+	wire branch_target_address;
+
 	pc_reg pc_reg0(
 		.clk(clk),
 		.rst(rst),
 		.stall(stall),
+		.branch_flag_i(branch_flag),
+		.branch_target_address_i(branch_target_address),
 		.pc(pc),
 		.ce(rom_ce_o)	
 	);
@@ -86,6 +91,7 @@ module openmips(
 		.stall(stall),
 		.if_pc(pc),
 		.if_inst(rom_data_i),
+		.branch_flag_i(branch_flag),
 		.id_pc(id_pc_i),
 		.id_inst(id_inst_i)      	
 	);
@@ -119,6 +125,8 @@ module openmips(
 		.wd_o(id_wd_o),
 		.wreg_o(id_wreg_o),
 
+		.branch_flag_o(branch_flag),
+		.branch_target_address_o(branch_target_address),
 		.stallreq(stallreq_from_id)
 	);
 
