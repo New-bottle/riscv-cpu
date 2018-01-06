@@ -14,6 +14,9 @@ module if_id (
 		if (rst == `RstEnable) begin
 			id_pc <= `ZeroWord;
 			id_inst <= `ZeroWord;
+		end else if (branch_flag_i == 1'b1) begin
+			id_pc <= `ZeroWord;
+			id_inst <= `ZeroWord;
 		end else if (stall[1] == `Stop && stall[2] == `NoStop) begin
 			id_pc <= `ZeroWord;
 			id_inst <= `ZeroWord;
