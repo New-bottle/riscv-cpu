@@ -19,7 +19,7 @@ module pc_reg (
 		end
 	end
 
-	always @ (negedge clk) begin
+	always @ (posedge clk) begin
 		if (ce == `ChipDisable) begin
 			pc <= 32'h00000000;
 		end else if (stall[0] == `NoStop) begin

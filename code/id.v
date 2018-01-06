@@ -36,6 +36,7 @@ module id (
 	// jump & branch operation
 	output reg                branch_flag_o,
 	output reg[`RegBus]       branch_target_address_o,
+	output reg[`RegBus]       link_addr_o,
 
 	// stall
 	output wire               stallreq
@@ -72,6 +73,8 @@ always @ (*) begin
 		reg2_addr_o <= `NOPRegAddr;
 		imm         <= 32'b0;
 	end else begin
+		branch_target_address_o <= `ZeroWord;
+		branch_flag_o <= 1'b0;
 		case (op)
 
 			`OP_OP_IMM:begin // can't deal with undefined behavior
@@ -217,7 +220,7 @@ always @ (*) begin
 			end
 			`OP_AUIPC:begin
 				aluop_o <= `EXE_AUIPC_OP;
-				alusel_o <= `EXE_RES_NOP;
+				alusel_o <= `EXE_RES_ARITH;
 				reg1_read_o <= 1'b0;
 				reg2_read_o <= 1'b0;
 				reg1_addr_o <= `NOPRegAddr;
@@ -231,27 +234,36 @@ always @ (*) begin
 			`OP_JAL:begin
 				aluop_o <= `EXE_JAL_OP;
 				alusel_o <= `EXE_RES_JUMP;
-				wd_o <= `NOPRegAddr;
-				wreg_o <= `WriteDisable;
+				wd_o <= inst_i[11:7];
+				wreg_o <= `WriteEnable;
 				instvalid <= `InstValid;
 				reg1_read_o <= 1'b0;
 				reg2_read_o <= 1'b0;
 				reg1_addr_o <= `NOPRegAddr;
 				reg2_addr_o <= `NOPRegAddr;
-				imm         <= 32'b0;
+				link_addr_o <= pc_i + 4;
+				imm <= `ZeroWord;
+				branch_target_address_o <= 
+//					{{12{inst_i[31]}},inst_i[30:12],{1'b0}};
+					pc_i + {{12{inst_i[31]}},inst_i[19:12],inst_i[20],inst_i[30:21],{1'b0}};
+				branch_flag_o <= 1'b1;
 			end
 
 			`OP_JALR:begin
 				aluop_o <= `EXE_JALR_OP;
 				alusel_o <= `EXE_RES_JUMP;
-				wd_o <= `NOPRegAddr;
-				wreg_o <= `WriteDisable;
+				wd_o <= inst_i[11:7];
+				wreg_o <= `WriteEnable;
 				instvalid <= `InstValid;
-				reg1_read_o <= 1'b0;
+				reg1_read_o <= 1'b1;
 				reg2_read_o <= 1'b0;
-				reg1_addr_o <= `NOPRegAddr;
+				reg1_addr_o <= inst_i[19:15];
 				reg2_addr_o <= `NOPRegAddr;
-				imm         <= pc_i + 4;
+				link_addr_o <= pc_i + 4;
+				imm <= `ZeroWord;
+				branch_target_address_o <= 
+					reg1_o + {{21{inst_i[31]}}, inst_i[30:20]};
+				branch_flag_o <= 1'b1;
 			end
 
 			`OP_BRANCH:begin
@@ -263,7 +275,7 @@ always @ (*) begin
 				reg2_read_o <= 1'b1;
 				reg1_addr_o <= inst_i[19:15];
 				reg2_addr_o <= inst_i[24:20];
-				imm         <= {{19{inst_i[31]}}, inst_i[7], inst_i[30:25], inst_i[11:8], 1'b0};
+				link_addr_o <= {{19{inst_i[31]}}, inst_i[7], inst_i[30:25], inst_i[11:8], 1'b0};
 				branch_flag_o <= 1'b0;
 				case (funct3)
 					`FUNCT3_BEQ:begin
@@ -340,10 +352,10 @@ always @ (*) begin
 	if (rst == `RstEnable) begin
 		reg1_o <= `ZeroWord;
 	end else if ((reg1_read_o == 1'b1) && (ex_wreg_i == 1'b1)
-				  && (ex_wd_i == reg1_addr_o)) begin
+				  && (ex_wd_i == reg1_addr_o) && ex_wd_i != `RegNumLog2'b0) begin
 		reg1_o <= ex_wdata_i;
 	end else if ((reg1_read_o == 1'b1) && (mem_wreg_i == 1'b1)
-				  && (mem_wd_i == reg1_addr_o)) begin
+				  && (mem_wd_i == reg1_addr_o) && mem_wd_i != `RegNumLog2'b0) begin
 		reg1_o <= mem_wdata_i;
 	end else if (reg1_read_o == 1'b1) begin
 		reg1_o <= reg1_data_i;
@@ -360,12 +372,12 @@ always @ (*) begin
 	if (rst == `RstEnable) begin
 		reg2_o <= `ZeroWord;
 	end else if (op == `OP_AUIPC) begin
-		reg2_o <= pc_i - 4;
+		reg2_o <= pc_i;
 	end else if ((reg2_read_o == 1'b1) && (ex_wreg_i == 1'b1)
-				  && (ex_wd_i == reg2_addr_o)) begin
+				  && (ex_wd_i == reg2_addr_o) && ex_wd_i != `RegNumLog2'b0) begin
 		reg2_o <= ex_wdata_i;
 	end else if ((reg2_read_o == 1'b1) && (mem_wreg_i == 1'b1)
-				  && (mem_wd_i == reg2_addr_o)) begin
+				  && (mem_wd_i == reg2_addr_o) && mem_wd_i != `RegNumLog2'b0) begin
 		reg2_o <= mem_wdata_i;
 	end else if (reg2_read_o == 1'b1) begin
 		reg2_o <= reg2_data_i;

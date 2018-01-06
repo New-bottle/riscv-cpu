@@ -29,6 +29,7 @@ module openmips(
 	wire[`RegBus]     id_reg2_o;
 	wire              id_wreg_o;
 	wire[`RegAddrBus] id_wd_o;
+	wire[`RegBus]     id_link_addr_o;
 	
 	wire[`AluOpBus]    ex_aluop_i;
 	wire[`AluSelBus]   ex_alusel_i;
@@ -36,6 +37,7 @@ module openmips(
 	wire[`RegBus]      ex_reg2_i;
 	wire               ex_wreg_i;
 	wire[`RegAddrBus]  ex_wd_i;
+	wire[`RegBus]      ex_link_addr_i;
 	
 	wire               ex_wreg_o;
 	wire[`RegAddrBus]  ex_wd_o;
@@ -71,7 +73,7 @@ module openmips(
 	wire stallreq_from_ex;
 
 	wire branch_flag;
-	wire branch_target_address;
+	wire [`RegBus] branch_target_address;
 
 	pc_reg pc_reg0(
 		.clk(clk),
@@ -127,6 +129,7 @@ module openmips(
 
 		.branch_flag_o(branch_flag),
 		.branch_target_address_o(branch_target_address),
+		.link_addr_o(id_link_addr_o),
 		.stallreq(stallreq_from_id)
 	);
 
@@ -156,13 +159,15 @@ module openmips(
 		.id_reg2(id_reg2_o),
 		.id_wd(id_wd_o),
 		.id_wreg(id_wreg_o),
+		.id_link_addr(id_link_addr_o),
 	
 		.ex_aluop(ex_aluop_i),
 		.ex_alusel(ex_alusel_i),
 		.ex_reg1(ex_reg1_i),
 		.ex_reg2(ex_reg2_i),
 		.ex_wd(ex_wd_i),
-		.ex_wreg(ex_wreg_i)
+		.ex_wreg(ex_wreg_i),
+		.ex_link_addr(ex_link_addr_i)
 	);		
 	
 	ex ex0(
@@ -174,6 +179,7 @@ module openmips(
 		.reg2_i(ex_reg2_i),
 		.wd_i(ex_wd_i),
 		.wreg_i(ex_wreg_i),
+		.link_addr_i(ex_link_addr_i),
 	  
 		.wd_o(ex_wd_o),
 		.wreg_o(ex_wreg_o),

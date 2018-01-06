@@ -9,6 +9,8 @@ module ex (
 	input wire[`RegAddrBus] wd_i,
 	input wire              wreg_i,
 
+	input wire[`RegBus]     link_addr_i,
+
 	// result of ex
 	output reg[`RegAddrBus] wd_o,
 	output reg              wreg_o,
@@ -32,6 +34,7 @@ module ex (
 		end else begin
 			opcode <= `ALU_OP_NOP;
 			case (aluop_i)
+				`EXE_AUIPC_OP             :  opcode <= `ALU_OP_ADD;
 				`EXE_ADDI_OP,  `EXE_ADD_OP:  opcode <= `ALU_OP_ADD;
 				`EXE_SUBI_OP,  `EXE_SUB_OP:  opcode <= `ALU_OP_SUB;
 				`EXE_SLLI_OP,  `EXE_SLL_OP:  opcode <= `ALU_OP_SLL;
@@ -49,42 +52,51 @@ module ex (
 	end
 
 	always @ (*) begin
-		wd_o <= `NOPRegAddr;
-		wreg_o <= 1'b0;
-		wdata_o <= `ZeroWord;
-		ex_wreg_o <= `NOPRegAddr;
-		ex_wd_o <= 1'b0;
-		ex_wdata_o <= `ZeroWord;
-		case (alusel_i)
-			`EXE_RES_LOGIC, `EXE_RES_ARITH,`EXE_RES_SHIFT:begin
-				wd_o <= wd_i;
-				wreg_o <= wreg_i;
-				ex_wreg_o <= wreg_i;
-				ex_wd_o <= wd_i;
-				wdata_o <= answer;
-				ex_wdata_o <= answer;
-			end
-			`EXE_RES_NOP:begin
-				wd_o <= wd_i;
-				wreg_o <= wreg_i;
-				ex_wreg_o <= wreg_i;
-				ex_wd_o <= wd_i;
-				wdata_o <= reg1_i;
-				ex_wdata_o <= reg1_i;
-			end
-			`EXE_RES_JUMP:begin
-				wd_o <= wd_i;
-				wreg_o <= wreg_i;
-				ex_wreg_o <= wreg_i;
-				ex_wd_o <= wd_i;
-				wdata_o <= reg1_i;
-				ex_wdata_o <= reg1_i;
-			end
-			default: begin
-				wdata_o <= `ZeroWord;
-				ex_wdata_o <= `ZeroWord;
-			end
-		endcase
+		if (rst == `RstEnable) begin
+			wd_o <= `NOPRegAddr;
+			wreg_o <= 1'b0;
+			wdata_o <= `ZeroWord;
+			ex_wreg_o <= `NOPRegAddr;
+			ex_wd_o <= 1'b0;
+			ex_wdata_o <= `ZeroWord;
+		end else begin
+			wd_o <= `NOPRegAddr;
+			wreg_o <= 1'b0;
+			wdata_o <= `ZeroWord;
+			ex_wreg_o <= `NOPRegAddr;
+			ex_wd_o <= 1'b0;
+			ex_wdata_o <= `ZeroWord;
+			case (alusel_i)
+				`EXE_RES_LOGIC, `EXE_RES_ARITH,`EXE_RES_SHIFT:begin
+					wd_o <= wd_i;
+					wreg_o <= wreg_i;
+					ex_wd_o <= wd_i;
+					ex_wreg_o <= wreg_i;
+					wdata_o <= answer;
+					ex_wdata_o <= answer;
+				end
+				`EXE_RES_NOP:begin
+					wd_o <= wd_i;
+					wreg_o <= wreg_i;
+					ex_wd_o <= wd_i;
+					ex_wreg_o <= wreg_i;
+					wdata_o <= reg1_i;
+					ex_wdata_o <= reg1_i;
+				end
+				`EXE_RES_JUMP:begin
+					wd_o <= wd_i;
+					wreg_o <= wreg_i;
+					ex_wreg_o <= wreg_i;
+					ex_wd_o <= wd_i;
+					wdata_o <= link_addr_i;
+					ex_wdata_o <= link_addr_i;
+				end
+				default: begin
+					wdata_o <= `ZeroWord;
+					ex_wdata_o <= `ZeroWord;
+				end
+			endcase
+		end
 	end
 
 endmodule
