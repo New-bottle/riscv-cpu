@@ -75,12 +75,18 @@ http://www.asic-world.com/systemverilog/tutorial.html
 
 ---
 
-## 2. Forwarding
-
-​	将EX和MEM阶段的结果直接送回decode阶段，从时序上来讲，EX的指令在MEM指令之后，所以最后会是EX的结果覆盖掉MEM的结果。所以优先将EX的结果forwarding回去，然后是MEM。
-
-
-
 ## Log :
 
 ### 2017-12-27 21:01:04 ori 指令运行成功
+
+## 可能的优化
+
+1. LUI实现成0寄存器与立即数取或，可以节约一点空间（元件）。
+
+## 可能出现的问题：
+
+1. PC寄存器的时序。
+
+   JALR读到的是当前PC还是已经+4的PC还是+8的PC？
+
+   要不把PC+4放在时钟下降沿来做？
