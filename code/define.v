@@ -16,7 +16,28 @@
 `define ChipDisable       1'b0            // 芯片禁止
 `define Stop              1'b1            // 流水线暂停
 `define NoStop            1'b0            // 流水线继续
+`define TRUE32            {31'b0,1'b1}
+`define FALSE32           32'b0
 
+`define ALU_OP_WIDTH      4
+`define XPR_LEN           32
+`define SHAMT_WIDTH       5
+//***********************     ALU op code     *************************
+`define ALU_OP_NOP        4'b0000
+`define ALU_OP_ADD        4'b0001
+`define ALU_OP_SUB        4'b0010
+`define ALU_OP_AND        4'b0011
+`define ALU_OP_OR         4'b0100
+`define ALU_OP_XOR        4'b0101
+`define ALU_OP_SLL        4'b0110
+`define ALU_OP_SRL        4'b0111
+`define ALU_OP_SRA        4'b1000
+`define ALU_OP_SEQ        4'b1001
+`define ALU_OP_SNE        4'b1010
+`define ALU_OP_SLT        4'b1011
+`define ALU_OP_SGE        4'b1100
+`define ALU_OP_SLTU       4'b1101
+`define ALU_OP_SGEU       4'b1110
 //***********************  Inst related define  ***********************
 // 1. AluOp
 // a.IMM-OP
@@ -30,6 +51,14 @@
 `define EXE_SRAI_OP      9'b001001011
 `define EXE_ORI_OP       9'b001001100
 `define EXE_ANDI_OP      9'b001001110
+`define EXE_JAL_OP       9'b110110000
+`define EXE_JALR_OP      9'b110010000 
+`define EXE_BEQ_OP       9'b110000000
+`define EXE_BNE_OP       9'b110000010
+`define EXE_BLT_OP       9'b110001000
+`define EXE_BGE_OP       9'b110001010
+`define EXE_BLTU_OP      9'b110001100
+`define EXE_BGEU_OP      9'b110001110
 
 // b.OP-OP
 `define EXE_ADD_OP        9'b011000000
@@ -51,10 +80,11 @@
 `define EXE_NOP_OP        9'b000000000
 
 // 2. AluSel
+`define EXE_RES_NOP       3'b000
 `define EXE_RES_LOGIC     3'b001
 `define EXE_RES_ARITH     3'b010
 `define EXE_RES_SHIFT     3'b011
-`define EXE_RES_NOP       3'b000
+`define EXE_RES_JUMP      3'b100
 
 
 //********************** ROM related define ***************************

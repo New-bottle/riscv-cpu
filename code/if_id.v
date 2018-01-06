@@ -6,6 +6,7 @@ module if_id (
 	input  wire[`InstAddrBus] if_pc,
 	input  wire[`InstBus]     if_inst,
 	input  wire[5:0]          stall,
+	input  wire               branch_flag_i,
 	output reg[`InstAddrBus]  id_pc,
 	output reg[`InstBus]      id_inst
 );
