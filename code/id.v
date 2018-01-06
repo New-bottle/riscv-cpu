@@ -259,6 +259,8 @@ end
 always @ (*) begin
 	if (rst == `RstEnable) begin
 		reg2_o <= `ZeroWord;
+	end else if (op == `OP_AUIPC) begin
+		reg2_o <= pc_i - 4;
 	end else if ((reg2_read_o == 1'b1) && (ex_wreg_i == 1'b1)
 				  && (ex_wd_i == reg2_addr_o)) begin
 		reg2_o <= ex_wdata_i;
