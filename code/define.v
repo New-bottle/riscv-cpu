@@ -19,6 +19,12 @@
 `define TRUE32            {31'b0,1'b1}
 `define FALSE32           32'b0
 
+`define DataAddrBus       31:0
+`define DataBus           31:0
+`define DataMemNum        256
+`define DataMemNumLog2    8
+`define ByteWidth         7:0
+
 `define ALU_OP_WIDTH      4
 `define XPR_LEN           32
 `define SHAMT_WIDTH       5
@@ -76,15 +82,26 @@
 `define EXE_LUI_OP        9'b011010000
 `define EXE_AUIPC_OP      9'b001010000
 
+// d.LOAD & STORE
+`define EXE_LB_OP          9'b000000000
+`define EXE_LH_OP          9'b000000010
+`define EXE_LW_OP          9'b000000100
+`define EXE_LBU_OP         9'b000001000
+`define EXE_LHU_OP         9'b000001010
+`define EXE_SB_OP          9'b010000000
+`define EXE_SH_OP          9'b010000010
+`define EXE_SW_OP          9'b010000100
+
 //`define EXE_OR_OP         8'b00100101
 `define EXE_NOP_OP        9'b000000000
 
 // 2. AluSel
-`define EXE_RES_NOP       3'b000
-`define EXE_RES_LOGIC     3'b001
-`define EXE_RES_ARITH     3'b010
-`define EXE_RES_SHIFT     3'b011
-`define EXE_RES_JUMP      3'b100
+`define EXE_RES_NOP        3'b000
+`define EXE_RES_LOGIC      3'b001
+`define EXE_RES_ARITH      3'b010
+`define EXE_RES_SHIFT      3'b011
+`define EXE_RES_JUMP       3'b100
+`define EXE_RES_LOAD_STORE 3'b101
 
 
 //********************** ROM related define ***************************

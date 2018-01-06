@@ -32,6 +32,7 @@ module id (
 	output reg[`RegBus]       reg2_o,
 	output reg[`RegAddrBus]   wd_o,
 	output reg                wreg_o,
+	output wire[`RegBus]      inst_o, // (for load/store)
 
 	// jump & branch operation
 	output reg                branch_flag_o,
@@ -41,6 +42,8 @@ module id (
 	// stall
 	output wire               stallreq
 );
+
+assign inst_o = inst_i;
 
 // 取得指令的指令码，功能码
 wire [6:0] op = inst_i[6:0];
@@ -332,6 +335,57 @@ always @ (*) begin
 				endcase
 			end
 
+			`OP_LOAD:begin
+				reg1_read_o <= 1'b1;
+				reg2_read_o <= 1'b0;
+				reg1_addr_o <= inst_i[19:15];
+				reg2_addr_o <= `NOPRegAddr;
+				wreg_o <= `WriteEnable;
+				wd_o <= inst_i[11:7];
+				instvalid <= `InstValid;
+				imm <= {{21{inst_i[31]}}, inst_i[30:20]};
+				alusel_o <= `EXE_RES_LOAD_STORE;
+				case (funct3)
+					`FUNCT3_LB:  begin
+						aluop_o <= `EXE_LB_OP;
+					end
+					`FUNCT3_LH:  begin
+						aluop_o <= `EXE_LH_OP;
+					end
+					`FUNCT3_LW:  begin
+						aluop_o <= `EXE_LW_OP;
+					end
+					`FUNCT3_LBU: begin
+						aluop_o <= `EXE_LBU_OP;
+					end
+					`FUNCT3_LHU: begin
+						aluop_o <= `EXE_LHU_OP;
+					end
+				endcase
+			end
+
+			`OP_STORE:begin
+				reg1_read_o <= 1'b1;
+				reg2_read_o <= 1'b1;
+				reg1_addr_o <= inst_i[19:15];
+				reg2_addr_o <= inst_i[24:20];
+				wreg_o <= `WriteDisable;
+				wd_o <= `NOPRegAddr;
+				instvalid <= `InstValid;
+//				imm <= {{21{inst_i[31]}}, inst_i[30:25], inst_i[11:7]}; // ex阶段另算
+				alusel_o <= `EXE_RES_LOAD_STORE;
+				case (funct3)
+					`FUNCT3_SB:  begin
+						aluop_o <= `EXE_SB_OP;
+					end
+					`FUNCT3_SH:  begin
+						aluop_o <= `EXE_SH_OP;
+					end
+					`FUNCT3_SW:  begin
+						aluop_o <= `EXE_SW_OP;
+					end
+				endcase
+			end
 			default:begin
 				aluop_o <= `EXE_NOP_OP;
 				alusel_o <= `EXE_RES_NOP;
