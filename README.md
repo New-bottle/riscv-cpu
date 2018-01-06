@@ -33,38 +33,38 @@ Instructions : (0/39)
      - [x] SLT
      - [x] SLTU
 
-- [ ] Control Transfer Instructions
+- [x] Control Transfer Instructions
 
-     - [ ] Unconditional Jumps
-          - [ ] JAL
-          - [ ] JALR
-     - [ ] Conditional Branches
-          - [ ] BEQ
-          - [ ] BNE
-          - [ ] BLT(U)
-          - [ ] BGE(U)
+     - [x] Unconditional Jumps
+          - [x] JAL
+          - [x] JALR
+     - [x] Conditional Branches
+          - [x] BEQ
+          - [x] BNE
+          - [x] BLT(U)
+          - [x] BGE(U)
 
-- [ ] Load and Store
+- [x] Load and Store
 
-     - [ ] LOAD
-     - [ ] STORE
+     - [x] LOAD
+     - [x] STORE
 
-- [ ] Control and Status Register Instructions (System)
+- [x] Control and Status Register Instructions (System)
 
-     - [ ] CSR Instructoins
-          - [ ] CSRRW
-          - [ ] CSRRS
-          - [ ] CSRRC
-          - [ ] CSRRWI
-          - [ ] CSRRSI
-          - [ ] CSRRCI
-     - [ ] Timers and Counters
-          - [ ] RDCYCLE
-          - [ ] RDTIME
-          - [ ] RDINSTRET
-     - [ ] Environment Call and Breakpoints
-          - [ ] ECALL
-          - [ ] EBREAK
+     - [x] CSR Instructoins
+          - [x] CSRRW
+          - [x] CSRRS
+          - [x] CSRRC
+          - [x] CSRRWI
+          - [x] CSRRSI
+          - [x] CSRRCI
+     - [x] Timers and Counters
+          - [x] RDCYCLE
+          - [x] RDTIME
+          - [x] RDINSTRET
+     - [x] Environment Call and Breakpoints
+          - [x] ECALL
+          - [x] EBREAK
 
 
 ---
