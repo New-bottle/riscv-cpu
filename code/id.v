@@ -32,9 +32,18 @@ module id (
 	output reg[`RegBus]       reg2_o,
 	output reg[`RegAddrBus]   wd_o,
 	output reg                wreg_o,
+	output wire[`RegBus]      inst_o, // (for load/store)
 
+	// jump & branch operation
+	output reg                branch_flag_o,
+	output reg[`RegBus]       branch_target_address_o,
+	output reg[`RegBus]       link_addr_o,
+
+	// stall
 	output wire               stallreq
 );
+
+assign inst_o = inst_i;
 
 // 取得指令的指令码，功能码
 wire [6:0] op = inst_i[6:0];
@@ -49,6 +58,10 @@ reg instvalid;
 
 assign stallreq = `NoStop;
 
+reg [`ALU_OP_WIDTH-1:0] opcode;
+wire [`RegBus]          answer;
+alu alu0(opcode, reg1_o, reg2_o, answer);
+
 // Part1: Instruction Decode
 always @ (*) begin
 	if (rst == `RstEnable) begin
@@ -61,25 +74,13 @@ always @ (*) begin
 		reg2_read_o <= 1'b0;
 		reg1_addr_o <= `NOPRegAddr;
 		reg2_addr_o <= `NOPRegAddr;
-		imm         <= 32'h0;
+		imm         <= 32'b0;
 	end else begin
-		/*
-		aluop_o <= `EXE_NOP_OP;
-		alusel_o <= `EXE_RES_NOP;
-		wd_o <= inst_i[11:7];
-		TODO
-		wd_o 的初值？？
-		wreg_o <= `WriteDisable;
-		instvalid <= `InstValid;
-		reg1_read_o <= 1'b0;
-		reg2_read_o <= 1'b0;
-		reg1_addr_o <= inst_i[25:21];
-		reg2_addr_o <= inst_i[20:16];
-		imm         <= `ZeroWord;
-		*/
-
+		branch_target_address_o <= `ZeroWord;
+		branch_flag_o <= 1'b0;
 		case (op)
-			`OP_OP_IMM:begin
+
+			`OP_OP_IMM:begin // can't deal with undefined behavior
 				reg1_read_o <= 1'b1;
 				reg2_read_o <= 1'b0;
 				reg1_addr_o <= inst_i[19:15];
@@ -222,6 +223,171 @@ always @ (*) begin
 			end
 			`OP_AUIPC:begin
 				aluop_o <= `EXE_AUIPC_OP;
+				alusel_o <= `EXE_RES_ARITH;
+				reg1_read_o <= 1'b0;
+				reg2_read_o <= 1'b0;
+				reg1_addr_o <= `NOPRegAddr;
+				reg2_addr_o <= `NOPRegAddr;
+				wreg_o <= `WriteEnable;
+				wd_o <= inst_i[11:7];
+				instvalid <= `InstValid;
+				imm <= {inst_i[31:12], 12'b0};
+			end
+
+			`OP_JAL:begin
+				aluop_o <= `EXE_JAL_OP;
+				alusel_o <= `EXE_RES_JUMP;
+				wd_o <= inst_i[11:7];
+				wreg_o <= `WriteEnable;
+				instvalid <= `InstValid;
+				reg1_read_o <= 1'b0;
+				reg2_read_o <= 1'b0;
+				reg1_addr_o <= `NOPRegAddr;
+				reg2_addr_o <= `NOPRegAddr;
+				link_addr_o <= pc_i + 4;
+				imm <= `ZeroWord;
+				branch_target_address_o <= 
+//					{{12{inst_i[31]}},inst_i[30:12],{1'b0}};
+					pc_i + {{12{inst_i[31]}},inst_i[19:12],inst_i[20],inst_i[30:21],{1'b0}};
+				branch_flag_o <= 1'b1;
+			end
+
+			`OP_JALR:begin
+				aluop_o <= `EXE_JALR_OP;
+				alusel_o <= `EXE_RES_JUMP;
+				wd_o <= inst_i[11:7];
+				wreg_o <= `WriteEnable;
+				instvalid <= `InstValid;
+				reg1_read_o <= 1'b1;
+				reg2_read_o <= 1'b0;
+				reg1_addr_o <= inst_i[19:15];
+				reg2_addr_o <= `NOPRegAddr;
+				link_addr_o <= pc_i + 4;
+				imm <= `ZeroWord;
+				branch_target_address_o <= 
+					reg1_o + {{21{inst_i[31]}}, inst_i[30:20]};
+				branch_flag_o <= 1'b1;
+			end
+
+			`OP_BRANCH:begin
+				alusel_o <= `EXE_RES_JUMP;
+				wd_o <= `NOPRegAddr;
+				wreg_o <= `WriteDisable;
+				instvalid <= `InstValid;
+				reg1_read_o <= 1'b1;
+				reg2_read_o <= 1'b1;
+				reg1_addr_o <= inst_i[19:15];
+				reg2_addr_o <= inst_i[24:20];
+				imm <= {{19{inst_i[31]}}, inst_i[7], inst_i[30:25], inst_i[11:8], 1'b0};
+				link_addr_o <= `ZeroWord;
+				branch_flag_o <= 1'b0;
+				case (funct3)
+					`FUNCT3_BEQ:begin
+						aluop_o <= `EXE_BEQ_OP;
+						opcode <= `ALU_OP_SEQ;
+						if (answer == `TRUE32) begin
+							branch_target_address_o <= pc_i + imm;
+							branch_flag_o <= 1'b1;
+						end
+					end
+					`FUNCT3_BNE:begin
+						aluop_o <= `EXE_BNE_OP;
+						opcode <= `ALU_OP_SNE;
+						if (answer == `TRUE32) begin
+							branch_target_address_o <= pc_i + imm;
+							branch_flag_o <= 1'b1;
+						end
+					end
+					`FUNCT3_BLT:begin
+						aluop_o <= `EXE_BLT_OP;
+						opcode <= `ALU_OP_SLT;
+						if (answer == `TRUE32) begin
+							branch_target_address_o <= pc_i + imm;
+							branch_flag_o <= 1'b1;
+						end
+					end
+					`FUNCT3_BGE:begin
+						aluop_o <= `EXE_BGE_OP;
+						opcode <= `ALU_OP_SGE;
+						if (answer == `TRUE32) begin
+							branch_target_address_o <= pc_i + imm;
+							branch_flag_o <= 1'b1;
+						end
+					end
+					`FUNCT3_BLTU:begin
+						aluop_o <= `EXE_BLTU_OP;
+						opcode <= `ALU_OP_SLTU;
+						if (answer == `TRUE32) begin
+							branch_target_address_o <= pc_i + imm;
+							branch_flag_o <= 1'b1;
+						end
+					end
+					`FUNCT3_BGEU:begin
+						aluop_o <= `EXE_BGEU_OP;
+						opcode <= `ALU_OP_SGEU;
+						if (answer == `TRUE32) begin
+							branch_target_address_o <= pc_i + imm;
+							branch_flag_o <= 1'b1;
+						end
+					end
+					default:begin
+					end
+				endcase
+			end
+
+			`OP_LOAD:begin
+				reg1_read_o <= 1'b1;
+				reg2_read_o <= 1'b0;
+				reg1_addr_o <= inst_i[19:15];
+				reg2_addr_o <= `NOPRegAddr;
+				wreg_o <= `WriteEnable;
+				wd_o <= inst_i[11:7];
+				instvalid <= `InstValid;
+				imm <= {{21{inst_i[31]}}, inst_i[30:20]};
+				alusel_o <= `EXE_RES_LOAD_STORE;
+				case (funct3)
+					`FUNCT3_LB:  begin
+						aluop_o <= `EXE_LB_OP;
+					end
+					`FUNCT3_LH:  begin
+						aluop_o <= `EXE_LH_OP;
+					end
+					`FUNCT3_LW:  begin
+						aluop_o <= `EXE_LW_OP;
+					end
+					`FUNCT3_LBU: begin
+						aluop_o <= `EXE_LBU_OP;
+					end
+					`FUNCT3_LHU: begin
+						aluop_o <= `EXE_LHU_OP;
+					end
+				endcase
+			end
+
+			`OP_STORE:begin
+				reg1_read_o <= 1'b1;
+				reg2_read_o <= 1'b1;
+				reg1_addr_o <= inst_i[19:15];
+				reg2_addr_o <= inst_i[24:20];
+				wreg_o <= `WriteDisable;
+				wd_o <= `NOPRegAddr;
+				instvalid <= `InstValid;
+//				imm <= {{21{inst_i[31]}}, inst_i[30:25], inst_i[11:7]}; // ex阶段另算
+				alusel_o <= `EXE_RES_LOAD_STORE;
+				case (funct3)
+					`FUNCT3_SB:  begin
+						aluop_o <= `EXE_SB_OP;
+					end
+					`FUNCT3_SH:  begin
+						aluop_o <= `EXE_SH_OP;
+					end
+					`FUNCT3_SW:  begin
+						aluop_o <= `EXE_SW_OP;
+					end
+				endcase
+			end
+			`OP_AUIPC:begin
+				aluop_o <= `EXE_AUIPC_OP;
 				alusel_o <= `EXE_RES_NOP;
 				reg1_read_o <= 1'b0;
 				reg2_read_o <= 1'b0;
@@ -235,6 +401,16 @@ always @ (*) begin
 
 
 			default:begin
+				aluop_o <= `EXE_NOP_OP;
+				alusel_o <= `EXE_RES_NOP;
+				wd_o <= `NOPRegAddr;
+				wreg_o <= `WriteDisable;
+				instvalid <= `InstValid;
+				reg1_read_o <= 1'b0;
+				reg2_read_o <= 1'b0;
+				reg1_addr_o <= `NOPRegAddr;
+				reg2_addr_o <= `NOPRegAddr;
+				imm         <= `ZeroWord;
 			end
 		endcase
 	end
@@ -245,10 +421,10 @@ always @ (*) begin
 	if (rst == `RstEnable) begin
 		reg1_o <= `ZeroWord;
 	end else if ((reg1_read_o == 1'b1) && (ex_wreg_i == 1'b1)
-				  && (ex_wd_i == reg1_addr_o)) begin
+				  && (ex_wd_i == reg1_addr_o) && ex_wd_i != `RegNumLog2'b0) begin
 		reg1_o <= ex_wdata_i;
 	end else if ((reg1_read_o == 1'b1) && (mem_wreg_i == 1'b1)
-				  && (mem_wd_i == reg1_addr_o)) begin
+				  && (mem_wd_i == reg1_addr_o) && mem_wd_i != `RegNumLog2'b0) begin
 		reg1_o <= mem_wdata_i;
 	end else if (reg1_read_o == 1'b1) begin
 		reg1_o <= reg1_data_i;
@@ -264,11 +440,13 @@ end
 always @ (*) begin
 	if (rst == `RstEnable) begin
 		reg2_o <= `ZeroWord;
+	end else if (op == `OP_AUIPC) begin
+		reg2_o <= pc_i;
 	end else if ((reg2_read_o == 1'b1) && (ex_wreg_i == 1'b1)
-				  && (ex_wd_i == reg2_addr_o)) begin
+				  && (ex_wd_i == reg2_addr_o) && ex_wd_i != `RegNumLog2'b0) begin
 		reg2_o <= ex_wdata_i;
 	end else if ((reg2_read_o == 1'b1) && (mem_wreg_i == 1'b1)
-				  && (mem_wd_i == reg2_addr_o)) begin
+				  && (mem_wd_i == reg2_addr_o) && mem_wd_i != `RegNumLog2'b0) begin
 		reg2_o <= mem_wdata_i;
 	end else if (reg2_read_o == 1'b1) begin
 		reg2_o <= reg2_data_i;

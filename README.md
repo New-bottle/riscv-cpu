@@ -33,38 +33,38 @@ Instructions : (0/39)
      - [x] SLT
      - [x] SLTU
 
-- [ ] Control Transfer Instructions
+- [x] Control Transfer Instructions
 
-     - [ ] Unconditional Jumps
-          - [ ] JAL
-          - [ ] JALR
-     - [ ] Conditional Branches
-          - [ ] BEQ
-          - [ ] BNE
-          - [ ] BLT(U)
-          - [ ] BGE(U)
+     - [x] Unconditional Jumps
+          - [x] JAL
+          - [x] JALR
+     - [x] Conditional Branches
+          - [x] BEQ
+          - [x] BNE
+          - [x] BLT(U)
+          - [x] BGE(U)
 
-- [ ] Load and Store
+- [x] Load and Store
 
-     - [ ] LOAD
-     - [ ] STORE
+     - [x] LOAD
+     - [x] STORE
 
-- [ ] Control and Status Register Instructions (System)
+- [x] Control and Status Register Instructions (System)
 
-     - [ ] CSR Instructoins
-          - [ ] CSRRW
-          - [ ] CSRRS
-          - [ ] CSRRC
-          - [ ] CSRRWI
-          - [ ] CSRRSI
-          - [ ] CSRRCI
-     - [ ] Timers and Counters
-          - [ ] RDCYCLE
-          - [ ] RDTIME
-          - [ ] RDINSTRET
-     - [ ] Environment Call and Breakpoints
-          - [ ] ECALL
-          - [ ] EBREAK
+     - [x] CSR Instructoins
+          - [x] CSRRW
+          - [x] CSRRS
+          - [x] CSRRC
+          - [x] CSRRWI
+          - [x] CSRRSI
+          - [x] CSRRCI
+     - [x] Timers and Counters
+          - [x] RDCYCLE
+          - [x] RDTIME
+          - [x] RDINSTRET
+     - [x] Environment Call and Breakpoints
+          - [x] ECALL
+          - [x] EBREAK
 
 
 ---
@@ -84,3 +84,15 @@ http://www.asic-world.com/systemverilog/tutorial.html
 ## Log :
 
 ### 2017-12-27 21:01:04 ori 指令运行成功
+
+## 可能的优化
+
+1. LUI实现成0寄存器与立即数取或，可以节约一点空间（元件）。
+
+## 可能出现的问题：
+
+1. PC寄存器的时序。
+
+   JALR读到的是当前PC还是已经+4的PC还是+8的PC？
+
+   要不把PC+4放在时钟下降沿来做？

@@ -25,7 +25,7 @@ reg[`RegBus]  regs[0:`RegNum-1];
 // write operation
 always @ (posedge clk) begin
 	if (rst == `RstDisable) begin
-		if ((we == `WriteEnable) && (waddr != `RegNumLog2'h0)) begin
+		if ((we == `WriteEnable) && (waddr != `RegNumLog2'b0)) begin
 			regs[waddr] <= wdata;
 		end
 	end
@@ -35,7 +35,7 @@ end
 always @ (*) begin
 	if (rst == `RstEnable) begin
 		rdata1 <= `ZeroWord;
-	end else if (raddr1 == `RegNumLog2'h0) begin
+	end else if (raddr1 == `RegNumLog2'b0) begin
 		rdata1 <= `ZeroWord;
 	end else if ((raddr1 == waddr) && (we == `WriteEnable) && (re1 == `ReadEnable)) begin
 		rdata1 <= wdata;
@@ -50,7 +50,7 @@ end
 always @ (*) begin
 	if (rst == `RstEnable) begin
 		rdata2 <= `ZeroWord;
-	end else if (raddr2 == `RegNumLog2'h0) begin
+	end else if (raddr2 == `RegNumLog2'b0) begin
 		rdata2 <= `ZeroWord;
 	end else if ((raddr2 == waddr) && (we == `WriteEnable) && (re2 == `ReadEnable)) begin
 		rdata2 <= wdata;
