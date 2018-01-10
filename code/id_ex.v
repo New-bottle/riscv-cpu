@@ -52,6 +52,15 @@ module id_ex (
 			ex_wreg <= id_wreg;
 			ex_link_addr <= id_link_addr;
 			ex_inst <= id_inst;
+		end else begin
+			ex_aluop <= `EXE_NOP_OP;
+			ex_alusel <= `EXE_RES_NOP;
+			ex_reg1 <= `ZeroWord;
+			ex_reg2 <= `ZeroWord;
+			ex_wd <= `NOPRegAddr;
+			ex_wreg <= `WriteDisable;
+			ex_link_addr <= `ZeroWord;
+			ex_inst <= `ZeroWord;
 		end
 	end
 endmodule

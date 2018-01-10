@@ -22,7 +22,7 @@ module ex (
 	output reg[`RegBus]     ex_wdata_o,
 	output reg[`RegAddrBus] ex_wd_o,
 	
-	output reg[5:0]         stallreq,
+	output reg              stallreq,
 
 	// mem
 	output wire[`AluOpBus]  aluop_o,
@@ -78,19 +78,20 @@ module ex (
 	end
 
 	always @ (*) begin
+		stallreq <= 1'b0;
 		if (rst == `RstEnable) begin
 			wd_o <= `NOPRegAddr;
 			wreg_o <= 1'b0;
 			wdata_o <= `ZeroWord;
-			ex_wreg_o <= `NOPRegAddr;
-			ex_wd_o <= 1'b0;
+			ex_wreg_o <= 1'b0;
+			ex_wd_o <= `NOPRegAddr;
 			ex_wdata_o <= `ZeroWord;
 		end else begin
 			wd_o <= `NOPRegAddr;
 			wreg_o <= 1'b0;
 			wdata_o <= `ZeroWord;
-			ex_wreg_o <= `NOPRegAddr;
-			ex_wd_o <= 1'b0;
+			ex_wreg_o <= 1'b0;
+			ex_wd_o <= `NOPRegAddr;
 			ex_wdata_o <= `ZeroWord;
 			case (alusel_i)
 				`EXE_RES_LOGIC, `EXE_RES_ARITH,`EXE_RES_SHIFT:begin

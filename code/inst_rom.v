@@ -7,7 +7,7 @@ module inst_rom (
 
 	reg[`InstBus]  inst_mem[0:`InstMemNum-1];
 
-	initial $readmemh ("/home/yanhongyu/Git/homework/riscv-cpu/code/arith.data", inst_mem);
+	initial $readmemh ("/home/yanhongyu/Git/homework/riscv-cpu/TEST/inst.data", inst_mem);
 
 	always @ (*) begin
 		if (ce == `ChipDisable) begin

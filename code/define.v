@@ -83,7 +83,7 @@
 `define EXE_AUIPC_OP      9'b001010000
 
 // d.LOAD & STORE
-`define EXE_LB_OP          9'b000000000
+`define EXE_LB_OP          9'b000000001
 `define EXE_LH_OP          9'b000000010
 `define EXE_LW_OP          9'b000000100
 `define EXE_LBU_OP         9'b000001000
