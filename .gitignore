@@ -2,4 +2,8 @@
 /code/proj/*
 /code/riscv-cpu*
 /code/main
-
+/test/*
+/TEST/*
+*.zip
+*.data
+*.S
