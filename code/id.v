@@ -386,20 +386,6 @@ always @ (*) begin
 					end
 				endcase
 			end
-			`OP_AUIPC:begin
-				aluop_o <= `EXE_AUIPC_OP;
-				alusel_o <= `EXE_RES_NOP;
-				reg1_read_o <= 1'b0;
-				reg2_read_o <= 1'b0;
-				reg1_addr_o <= `NOPRegAddr;
-				reg2_addr_o <= `NOPRegAddr;
-				wreg_o <= `WriteEnable;
-				wd_o <= inst_i[11:7];
-				instvalid <= `InstValid;
-				imm <= {inst_i[31:12], 12'b0};
-			end
-
-
 			default:begin
 				aluop_o <= `EXE_NOP_OP;
 				alusel_o <= `EXE_RES_NOP;

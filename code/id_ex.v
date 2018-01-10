@@ -14,8 +14,6 @@ module id_ex (
 
 	input wire[5:0]         stall,
 
-	input wire[5:0]         stall,
-
 	output reg[`AluOpBus]   ex_aluop,
 	output reg[`AluSelBus]  ex_alusel,
 	output reg[`RegBus]     ex_reg1,

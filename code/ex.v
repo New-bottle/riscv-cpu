@@ -77,7 +77,6 @@ module ex (
 		end
 	end
 
-
 	always @ (*) begin
 		if (rst == `RstEnable) begin
 			wd_o <= `NOPRegAddr;
