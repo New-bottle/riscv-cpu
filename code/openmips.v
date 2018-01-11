@@ -128,6 +128,7 @@ module openmips(
 		.mem_wreg_i(fwd_mem_wreg_o),
 		.mem_wdata_i(fwd_mem_wdata_o),
 		.mem_wd_i(fwd_mem_wd_o),
+		.ex_aluop_i(ex_aluop_o),
 
 		.reg1_read_o(reg1_read),
 		.reg2_read_o(reg2_read), 	  

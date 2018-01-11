@@ -14,6 +14,8 @@ module id (
 	input wire [`RegBus]      ex_wdata_i,
 	input wire [`RegAddrBus]  ex_wd_i,
 
+	input wire [`AluOpBus]    ex_aluop_i,
+
 	// MEM-forwarding
 	input wire                mem_wreg_i,
 	input wire [`RegBus]      mem_wdata_i,
@@ -43,6 +45,38 @@ module id (
 	output wire               stallreq
 );
 
+reg stallreq_for_reg1_loadrelate;
+reg stallreq_for_reg2_loadrelate;
+wire pre_inst_is_load;
+assign pre_inst_is_load = ((ex_aluop_i == `EXE_LB_OP)  ||
+						   (ex_aluop_i == `EXE_LBU_OP) ||
+						   (ex_aluop_i == `EXE_LH_OP)  ||
+                           (ex_aluop_i == `EXE_LHU_OP) ||
+						   (ex_aluop_i == `EXE_LW_OP)) ? 1'b1 : 1'b0;
+
+always @ (*) begin
+	stallreq_for_reg1_loadrelate <= `NoStop;
+	if (rst == `RstEnable) begin
+		stallreq_for_reg1_loadrelate <= `NoStop;
+	end else if (pre_inst_is_load == 1'b1 && ex_wd_i == reg1_addr_o
+		&& reg1_read_o == 1'b1) begin
+		stallreq_for_reg1_loadrelate <= `Stop;
+	end else begin
+		stallreq_for_reg1_loadrelate <= `NoStop;
+	end
+end
+
+always @ (*) begin
+	stallreq_for_reg2_loadrelate <= `NoStop;
+	if (rst == `RstEnable) begin
+		stallreq_for_reg2_loadrelate <= `NoStop;
+	end else if (pre_inst_is_load == 1'b1 && ex_wd_i == reg2_addr_o
+		&& reg2_read_o == 1'b1) begin
+		stallreq_for_reg2_loadrelate <= `Stop;
+	end else begin
+		stallreq_for_reg2_loadrelate <= `NoStop;
+	end
+end
 assign inst_o = inst_i;
 
 // 取得指令的指令码，功能码
@@ -55,8 +89,6 @@ reg[`RegBus]   imm;
 
 // 指示指令是否有效
 reg instvalid;
-
-assign stallreq = `NoStop;
 
 reg [`ALU_OP_WIDTH-1:0] opcode;
 wire [`RegBus]          answer;
@@ -442,5 +474,7 @@ always @ (*) begin
 		reg2_o <= `ZeroWord;
 	end
 end
+
+assign stallreq = stallreq_for_reg1_loadrelate | stallreq_for_reg2_loadrelate;
 
 endmodule
